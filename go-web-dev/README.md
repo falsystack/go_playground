@@ -297,7 +297,10 @@ log.Fatal(http.ListenAndServe(":8080", http.FileServer(http.Dir("."))))
 
 ```go
 // http.StatusNotFound -> 404
-http.Error(w, "file not found", http.StatusNotFound)
+if err != nil {
+  http.Error(w, "file not found", http.StatusNotFound)
+  return
+}
 ```
 
 ## NotFoundHandler
@@ -311,8 +314,8 @@ http.Handle("/favicon.ico", http.NotFoundHandler())
 get -> url
 post -> body
 ### Query parameter
-`req.FormValue(ket string) string`は
-- キーが存在しない場合空文字列を返す。
+`req.FormValue(key string) string`は
+- キーが存在しない場合空文字を返す。
 - URLのクエリパラメタよりHTML FormのPOST / PUTのBodyパラメタが優先される。
 - 同じキーに複数の値を持つ場合、ParseFormを呼び出し後Request.Formを調べる。
 ```go
