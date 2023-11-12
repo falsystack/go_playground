@@ -311,8 +311,9 @@ http.Handle("/favicon.ico", http.NotFoundHandler())
 ```
 
 ## Passing Data
-get -> url
-post -> body
+html formで
+- get -> url
+- post -> body
 ### Query parameter
 `req.FormValue(key string) string`は
 - キーが存在しない場合空文字を返す。
