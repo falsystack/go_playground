@@ -433,10 +433,10 @@ RFC7231で確認しよう
 - 307 Temporary Redirect, Request Methodが保持される。
 ### http.Redirect()
 ```go
-// post -> get, 常に GET を使用
+// post -> get, 常に GET を使用, 303
 http.Redirect(w, req, "/", http.StatusSeeOther)
 
-// post -> post, Request Methodが保持される。
+// post -> post, Request Methodが保持される。, 307
 http.Redirect(w, req, "/", http.StatusTemporaryRedirect)
 ```
 ### ヘッダーに直書き
