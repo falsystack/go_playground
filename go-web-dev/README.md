@@ -477,7 +477,8 @@ cookie, err := req.Cookie("counter-cookie")
 ```
 
 ### Remove Cookie
-MaxAgeを0又は-1にする。
+- MaxAgeを0又は-1にする。
+- ExpiresはDeprecatedになった。
 ```go
 cookie, err := req.Cookie("my-cookie")
 if err == http.ErrNoCookie {
