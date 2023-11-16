@@ -532,7 +532,7 @@ _ "github.com/go-sql-driver/mysql"
 ```
 
 ```go
-db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/intro?charset=utf8")
+db, err := sql.Open("mysql", "root:[password]@tcp(localhost:3306)/udemy?charset=utf8")
 if err != nil {
     log.Println(err)
 }
