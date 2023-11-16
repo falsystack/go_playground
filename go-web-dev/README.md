@@ -547,6 +547,14 @@ if err = db.Ping(); err != nil {
 # HMAC
 HMACはHash basedのメッセージ認証コードの略だ。
 
+# Base64
+cookie は`!#$%&'*+-.^_`|~`この文字達の組み合わせのみを許容する。のでbase64を使う。
+```go
+// encode
+s64 := base64.StdEncoding.EncodeToString([]byte(s))
+// decode
+bs, err := base64.StdEncoding.DecodeString(s64)
+```
 
 
 
