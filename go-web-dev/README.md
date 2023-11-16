@@ -544,4 +544,10 @@ if err = db.Ping(); err != nil {
 }
 ```
 
+# HMAC
+HMACはHash basedのメッセージ認証コードの略だ。
+
+
+
+
 
