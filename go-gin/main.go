@@ -3,7 +3,7 @@ package main
 import "github.com/gin-gonic/gin"
 
 func main() {
-	r := gin.Default()
+	r := gin.Default() // default ルータの初期化
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",

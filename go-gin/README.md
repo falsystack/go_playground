@@ -24,3 +24,22 @@ https://gin-gonic.com/ja/docs/quickstart/
 go get -u github.com/gin-gonic/gin
 ```
 
+
+
+
+
+# ライブラリ
+## air
+Hot Reloadができるようにしてくれるライブラリ
+- https://github.com/cosmtrek/air
+
+### 初期化
+```shell
+air init
+```
+`command not found`が出る場合
+`.zshrc` にパスを指定
+```zsh
+export PATH="go env GOPATHで確認したパス/bin:$PATH"
+```
+
