@@ -50,6 +50,29 @@ name := ctx.Query("name")
 `?name=kakao`の場合 `kakao`が取得できる
 
 
+## バリデーション
+Ginでバリデーションを使う方法
+1. リクエストデータの構造体（DTO）を定義
+```go
+type CreateItemInput struct {
+	Name string `json:"name"`
+	Price uint `json:"price"`
+	Description string `json:"description"`
+}
+```
+2.  DTOにバリデーションのためのタグを追加
+```go
+type CreateItemInput struct {
+    Name string `json:"name" binding:"required,min=2"`
+    Price uint `json:"price" binding:"required,min=1,max=999999"`
+    Description string `json:"description"`
+}
+```
+3. リクエストデータをDTOにバインド
+```go
+ctx.ShouldBindJSON(&input)
+```
+
 # ライブラリ
 ## air
 Hot Reloadができるようにしてくれるライブラリ
