@@ -24,8 +24,30 @@ https://gin-gonic.com/ja/docs/quickstart/
 go get -u github.com/gin-gonic/gin
 ```
 
+# 機能
+## パスパラメータ
+### パスパラメータ定義
+`:parameterName`で定義
+```go
+r.GET("/items/:id", itemController.FindById)
+```
+### パスパラメータ利用
+パスパラメータは常に `string` typeになる
+```go
+itemId := ctx.Param("id")
+```
 
-
+## クエリパラメータ
+### クエリパラメータの定義
+特別のキーワードの設定は不要
+```go
+r.GET("/items", itemController.FIndByName)
+```
+### クエリパラメータの利用
+```go
+name := ctx.Query("name")
+```
+`?name=kakao`の場合 `kakao`が取得できる
 
 
 # ライブラリ
