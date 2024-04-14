@@ -6,14 +6,14 @@ type ItemRepository interface {
 	FindAll() (*[]models.Item, error)
 }
 
-type ItemMemoryRepository struct {
+func NewItemMemoryRepository(items []models.Item) ItemRepository {
+	return &itemMemoryRepository{items: items}
+}
+
+type itemMemoryRepository struct {
 	items []models.Item
 }
 
-func NewItemMemoryRepository(items []models.Item) ItemRepository {
-	return &ItemMemoryRepository{items: items}
-}
-
-func (r *ItemMemoryRepository) FindAll() (*[]models.Item, error) {
+func (r *itemMemoryRepository) FindAll() (*[]models.Item, error) {
 	return &r.items, nil
 }

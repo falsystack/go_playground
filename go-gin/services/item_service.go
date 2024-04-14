@@ -9,14 +9,14 @@ type ItemService interface {
 	FindAll() (*[]models.Item, error)
 }
 
-type ItemServiceImpl struct {
+type itemServiceImpl struct {
 	repository repositories.ItemRepository
 }
 
 func NewItemService(repository repositories.ItemRepository) ItemService {
-	return &ItemServiceImpl{repository: repository}
+	return &itemServiceImpl{repository: repository}
 }
 
-func (s *ItemServiceImpl) FindAll() (*[]models.Item, error) {
+func (s *itemServiceImpl) FindAll() (*[]models.Item, error) {
 	return s.repository.FindAll()
 }
