@@ -1,9 +1,13 @@
 package repositories
 
-import "go-gin/models"
+import (
+	"errors"
+	"go-gin/models"
+)
 
 type ItemRepository interface {
 	FindAll() (*[]models.Item, error)
+	FindById(itemId uint) (*models.Item, error)
 }
 
 func NewItemMemoryRepository(items []models.Item) ItemRepository {
@@ -12,6 +16,15 @@ func NewItemMemoryRepository(items []models.Item) ItemRepository {
 
 type itemMemoryRepository struct {
 	items []models.Item
+}
+
+func (r *itemMemoryRepository) FindById(itemId uint) (*models.Item, error) {
+	for _, item := range r.items {
+		if item.ID == itemId {
+			return &item, nil
+		}
+	}
+	return nil, errors.New("Item not found")
 }
 
 func (r *itemMemoryRepository) FindAll() (*[]models.Item, error) {

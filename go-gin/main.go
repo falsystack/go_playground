@@ -37,6 +37,9 @@ func main() {
 	itemController := controllers.NewItemController(itemService)
 
 	r := gin.Default() // default ルータの初期化
+
 	r.GET("/items", itemController.FindAll)
+	r.GET("/items/:id", itemController.FindById)
+
 	r.Run("localhost:8080") // 0.0.0.0:8080 でサーバーを立てます。
 }
