@@ -160,3 +160,23 @@ type Item struct {
 	SoldOut     bool `gorm:"not null;default:false"`
 }
 ```
+migrationを行う
+
+mainパッケージでmain関数を作ってやる理由はアプリケーションの実行とmigrationを分けるためである。
+```go
+package main
+
+import (
+	"go-gin/infra"
+	"go-gin/models"
+)
+
+func main() {
+	infra.Init()
+	db := infra.SetupDB()
+
+	if err := db.AutoMigrate(&models.Item{}); err != nil {
+		panic("Failed to migrate database")
+	}
+}
+```
