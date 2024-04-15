@@ -88,3 +88,15 @@ air init
 export PATH="go env GOPATHで確認したパス/bin:$PATH"
 ```
 
+## godotenv
+- `.env`ファイルをgoでも使用可能にする。
+- `godotenv.Load()` の引数に何も指定しない場合基本値として `.env` が使われる
+
+```go
+func Init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
+```

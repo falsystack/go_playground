@@ -3,12 +3,15 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"go-gin/controllers"
+	"go-gin/infra"
 	"go-gin/models"
 	"go-gin/repositories"
 	"go-gin/services"
 )
 
 func main() {
+	infra.Init()
+
 	items := []models.Item{
 		{
 			ID:          1,
