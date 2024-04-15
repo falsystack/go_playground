@@ -100,3 +100,63 @@ func Init() {
 	}
 }
 ```
+# フレームワーク
+## gorm
+install
+```shell
+go get -u gorm.io/gorm
+go get -u gorm.io/driver/sqlite
+go get -u gorm.io/driver/postgres
+```
+`.env` ファイルに接続情報設定
+
+```env
+ENV=prod
+DB_HOST=localhost
+DB_USER=ginuser
+DB_PASSWORD=ginpassword
+DB_NAME=fleamarket
+DB_PORT=5432
+```
+
+databaseへの接続設定
+```go
+func SetupDB() *gorm.DB {
+	dsn := fmt.Sprintf(
+		"host=$s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Tokyo",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("Failed to connect to database")
+	}
+
+	return db
+}
+```
+
+### 
+`gorm.Model`には以下の情報が含む構造体である
+```go
+type Model struct {
+    ID        uint `gorm:"primarykey"`
+    CreatedAt time.Time
+    UpdatedAt time.Time
+    DeletedAt DeletedAt `gorm:"index"`
+}
+```
+`gorm:""`タグを利用してマッピングすることが可能
+```go
+type Item struct {
+	gorm.Model
+	Name        string `gorm:"not null"`
+	Price       uint `gorm:"not null"`
+	Description string
+	SoldOut     bool `gorm:"not null;default:false"`
+}
+```
