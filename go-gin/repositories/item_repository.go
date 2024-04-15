@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"go-gin/models"
+	"gorm.io/gorm"
 )
 
 type ItemRepository interface {
@@ -58,4 +59,40 @@ func (i *itemMemoryRepository) Delete(itemId uint) error {
 		}
 	}
 	return errors.New("Item not found")
+}
+
+type itemRepositoryImpl struct {
+	db *gorm.DB
+}
+
+func NewItemRepository(db *gorm.DB) ItemRepository {
+	return &itemRepositoryImpl{db: db}
+}
+
+func (i *itemRepositoryImpl) Create(newItem models.Item) (*models.Item, error) {
+	result := i.db.Create(&newItem)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &newItem, nil
+}
+
+func (i *itemRepositoryImpl) FindAll() (*[]models.Item, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (i *itemRepositoryImpl) FindById(itemId uint) (*models.Item, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (i *itemRepositoryImpl) Update(updateItem models.Item) (*models.Item, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (i *itemRepositoryImpl) Delete(itemId uint) error {
+	//TODO implement me
+	panic("implement me")
 }
