@@ -78,21 +78,46 @@ func (i *itemRepositoryImpl) Create(newItem models.Item) (*models.Item, error) {
 }
 
 func (i *itemRepositoryImpl) FindAll() (*[]models.Item, error) {
-	//TODO implement me
-	panic("implement me")
+	var items []models.Item
+	result := i.db.Find(&items)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &items, nil
 }
 
 func (i *itemRepositoryImpl) FindById(itemId uint) (*models.Item, error) {
-	//TODO implement me
-	panic("implement me")
+	var item models.Item
+	result := i.db.First(&item, itemId)
+	if result.Error != nil {
+		if result.Error.Error() == "record not found" {
+			return nil, errors.New("Item not found")
+		}
+		return nil, result.Error
+	}
+	return &item, nil
 }
 
 func (i *itemRepositoryImpl) Update(updateItem models.Item) (*models.Item, error) {
-	//TODO implement me
-	panic("implement me")
+	result := i.db.Save(&updateItem) // update処理に使う
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &updateItem, nil
 }
 
 func (i *itemRepositoryImpl) Delete(itemId uint) error {
-	//TODO implement me
-	panic("implement me")
+	targetItem, err := i.FindById(itemId)
+	if err != nil {
+		return err
+	}
+
+	// gormのdeleteは論理削除（実際テーブルで削除されるのではなくdeletedAtにマークされる）
+	// 物理削除したい場合Unscoped()を付ける必要がある。
+	// i.db.Unscoped().Delete(&targetItem)
+	result := i.db.Delete(&targetItem)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
