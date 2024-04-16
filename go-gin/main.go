@@ -41,14 +41,21 @@ func main() {
 	itemService := services.NewItemService(itemRepository)
 	itemController := controllers.NewItemController(itemService)
 
-	r := gin.Default() // default ルータの初期化
+	authRepository := repositories.NewAuthRepository(db)
+	authService := services.NewAuthService(authRepository)
+	authController := controllers.NewAuthController(authService)
 
+	r := gin.Default() // default ルータの初期化
+	authRouter := r.Group("/auth")
 	itemRouter := r.Group("/items")
+
 	itemRouter.GET("/", itemController.FindAll)
 	itemRouter.POST("/", itemController.Create)
 	itemRouter.GET("/:id", itemController.FindById)
 	itemRouter.PUT("/:id", itemController.Update)
 	itemRouter.DELETE("/:id", itemController.Delete)
+
+	authRouter.POST("/signup", authController.Signup)
 
 	r.Run("localhost:8080") // 0.0.0.0:8080 でサーバーを立てます。
 }

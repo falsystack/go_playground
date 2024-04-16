@@ -100,6 +100,14 @@ func Init() {
 	}
 }
 ```
+
+## bcrypt
+hash化
+```go
+hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+```
+
+
 # フレームワーク
 ## gorm
 install
@@ -140,7 +148,7 @@ func SetupDB() *gorm.DB {
 }
 ```
 
-### 
+### テーブルにマイグレーション
 `gorm.Model`には以下の情報が含む構造体である
 ```go
 type Model struct {
