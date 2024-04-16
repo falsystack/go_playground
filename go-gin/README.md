@@ -72,6 +72,54 @@ type CreateItemInput struct {
 ```go
 ctx.ShouldBindJSON(&input)
 ```
+## ミドルウェアとは
+- リクエスト処理の前後に任意の処理を挿入出来る機能
+  - ex) ロギング、認証、リクエストやレスポンスの加工
+### ミドルウェアを使用するメリット
+- コードの再利用性
+  - ロギング、認証など一般的な機能をモジュール化し、アプリケーションの異なる部分で再利用可能
+- 責務の分離
+  - ビジネスロジックから共通機能を分離することで、各コード部分が特定の目的に集中することができ、コードの可読性と保守性が向上
+### Ginにおけるミドルウェアの使い方
+- 前からの引数から順次実行される、順番に注意が必要
+- 全エンドポイントに適用する方法
+  - ルーターの`Use`メソッドを使用
+```go
+r := gin.Default()
+r.Use(middleware)
+```
+- 個別のエンドポイントに適用する方法
+  - エンドポイントに直接ミドルウェアを渡す
+```go
+itemRouter.GET("", Middleware1, itemController.Findall)
+itemRouter.POST("", Middleware1, Middleware2, itemController.Create)
+```
+- ルートグループに対して適用する方法
+  - グループ作成時にミドルウェアを渡す
+```go
+itemRouter := r.Group("/items", Middleware1)
+authRouter := r.Group("/auth", Middleware1, Middleware2)
+```
+### カスタムミドルウェアの作成
+- 独自のミドルウェアを作成することが可能
+  - gin.HandleFuncを返却する関数を定義
+```go
+func Logger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 前処理
+		t := time.Now()
+		c.Set("example", "12345")
+		
+		// 次のミドルウェア or 目的の処理
+		c.Next()
+		
+		// 後処理
+		latency := time.Since(t)
+		log.Print(latency)
+    }   
+}
+```
+---
 
 # ライブラリ
 ## air
