@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"go-gin/models"
 	"go-gin/repositories"
@@ -12,6 +13,7 @@ import (
 type AuthService interface {
 	Signup(email string, password string) error
 	Login(email string, password string) (*string, error)
+	GetUserFromToken(token string) (*models.User, error)
 }
 
 type authServiceImpl struct {
@@ -30,6 +32,31 @@ func createToken(userId uint, email string) (*string, error) {
 		return nil, err
 	}
 	return &tokenString, nil
+}
+
+func (a *authServiceImpl) GetUserFromToken(tokenString string) (*models.User, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("SECRET_KEY")), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var user *models.User
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		if float64(time.Now().Unix()) > claims["exp"].(float64) {
+			return nil, jwt.ErrTokenExpired
+		}
+
+		user, err = a.repository.FindUser(claims["email"].(string))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return user, nil
 }
 
 func (a *authServiceImpl) Login(email string, password string) (*string, error) {
