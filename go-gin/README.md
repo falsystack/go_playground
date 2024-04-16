@@ -106,6 +106,16 @@ hash化
 ```go
 hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 ```
+hash化されたパスワードと平文のパスワードの比較
+```go
+err = bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(password))
+```
+
+## jwt
+install
+```shell
+go get -u github.com/golang-jwt/jwt/v5
+```
 
 
 # フレームワーク
@@ -187,4 +197,10 @@ func main() {
 		panic("Failed to migrate database")
 	}
 }
+```
+
+# ETC
+randomな文字列生成
+```shell
+openssl rand -hex 32
 ```
