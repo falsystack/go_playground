@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-gin/controllers"
 	"go-gin/infra"
+	"go-gin/middlewares"
 	"go-gin/repositories"
 	"go-gin/services"
 )
@@ -48,9 +49,10 @@ func main() {
 	r := gin.Default() // default ルータの初期化
 	authRouter := r.Group("/auth")
 	itemRouter := r.Group("/items")
+	itemRouterWithAuth := r.Group("/items", middlewares.AuthMiddleware(authService))
 
 	itemRouter.GET("/", itemController.FindAll)
-	itemRouter.POST("/", itemController.Create)
+	itemRouterWithAuth.POST("/", itemController.Create)
 	itemRouter.GET("/:id", itemController.FindById)
 	itemRouter.PUT("/:id", itemController.Update)
 	itemRouter.DELETE("/:id", itemController.Delete)
