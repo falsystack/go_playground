@@ -8,10 +8,10 @@ import (
 
 type ItemRepository interface {
 	FindAll() (*[]models.Item, error)
-	FindById(itemId uint) (*models.Item, error)
+	FindById(itemId uint, userId uint) (*models.Item, error)
 	Create(newItem models.Item) (*models.Item, error)
 	Update(updateItem models.Item) (*models.Item, error)
-	Delete(itemId uint) error
+	Delete(itemId uint, userId uint) error
 }
 
 func NewItemMemoryRepository(items []models.Item) ItemRepository {
@@ -22,7 +22,7 @@ type itemMemoryRepository struct {
 	items []models.Item
 }
 
-func (i *itemMemoryRepository) FindById(itemId uint) (*models.Item, error) {
+func (i *itemMemoryRepository) FindById(itemId uint, userId uint) (*models.Item, error) {
 	for _, item := range i.items {
 		if item.ID == itemId {
 			return &item, nil
@@ -51,7 +51,7 @@ func (i *itemMemoryRepository) Update(updateItem models.Item) (*models.Item, err
 	return nil, errors.New("Unexpected error")
 }
 
-func (i *itemMemoryRepository) Delete(itemId uint) error {
+func (i *itemMemoryRepository) Delete(itemId uint, userId uint) error {
 	for idx, item := range i.items {
 		if item.ID == itemId {
 			i.items = append(i.items[:idx], i.items[idx+1:]...)
@@ -86,9 +86,9 @@ func (i *itemRepositoryImpl) FindAll() (*[]models.Item, error) {
 	return &items, nil
 }
 
-func (i *itemRepositoryImpl) FindById(itemId uint) (*models.Item, error) {
+func (i *itemRepositoryImpl) FindById(itemId uint, userId uint) (*models.Item, error) {
 	var item models.Item
-	result := i.db.First(&item, itemId)
+	result := i.db.First(&item, "id = ? AND user_id = ?", itemId, userId)
 	if result.Error != nil {
 		if result.Error.Error() == "record not found" {
 			return nil, errors.New("Item not found")
@@ -106,8 +106,8 @@ func (i *itemRepositoryImpl) Update(updateItem models.Item) (*models.Item, error
 	return &updateItem, nil
 }
 
-func (i *itemRepositoryImpl) Delete(itemId uint) error {
-	targetItem, err := i.FindById(itemId)
+func (i *itemRepositoryImpl) Delete(itemId uint, userId uint) error {
+	targetItem, err := i.FindById(itemId, userId)
 	if err != nil {
 		return err
 	}

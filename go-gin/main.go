@@ -53,9 +53,9 @@ func main() {
 
 	itemRouter.GET("/", itemController.FindAll)
 	itemRouterWithAuth.POST("/", itemController.Create)
-	itemRouter.GET("/:id", itemController.FindById)
-	itemRouter.PUT("/:id", itemController.Update)
-	itemRouter.DELETE("/:id", itemController.Delete)
+	itemRouterWithAuth.GET("/:id", itemController.FindById)
+	itemRouterWithAuth.PUT("/:id", itemController.Update)
+	itemRouterWithAuth.DELETE("/:id", itemController.Delete)
 
 	authRouter.POST("/signup", authController.Signup)
 	authRouter.POST("/login", authController.Login)

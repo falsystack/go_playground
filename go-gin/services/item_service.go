@@ -8,10 +8,10 @@ import (
 
 type ItemService interface {
 	FindAll() (*[]models.Item, error)
-	FindById(itemId uint) (*models.Item, error)
+	FindById(itemId uint, userId uint) (*models.Item, error)
 	Create(createItemInput dto.CreateItemInput, userId uint) (*models.Item, error)
-	Update(itemId uint, updateItemInput dto.UpdateItemInput) (*models.Item, error)
-	Delete(itemId uint) error
+	Update(itemId uint, userId uint, updateItemInput dto.UpdateItemInput) (*models.Item, error)
+	Delete(itemId uint, userId uint) error
 }
 
 type itemServiceImpl struct {
@@ -26,8 +26,8 @@ func (i *itemServiceImpl) FindAll() (*[]models.Item, error) {
 	return i.repository.FindAll()
 }
 
-func (i *itemServiceImpl) FindById(itemId uint) (*models.Item, error) {
-	return i.repository.FindById(itemId)
+func (i *itemServiceImpl) FindById(itemId uint, userId uint) (*models.Item, error) {
+	return i.repository.FindById(itemId, userId)
 }
 
 func (i *itemServiceImpl) Create(createItemInput dto.CreateItemInput, userId uint) (*models.Item, error) {
@@ -41,8 +41,8 @@ func (i *itemServiceImpl) Create(createItemInput dto.CreateItemInput, userId uin
 	return i.repository.Create(newItem)
 }
 
-func (i *itemServiceImpl) Update(itemId uint, updateItemInput dto.UpdateItemInput) (*models.Item, error) {
-	targetItem, err := i.repository.FindById(itemId)
+func (i *itemServiceImpl) Update(itemId uint, userId uint, updateItemInput dto.UpdateItemInput) (*models.Item, error) {
+	targetItem, err := i.repository.FindById(itemId, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -61,6 +61,6 @@ func (i *itemServiceImpl) Update(itemId uint, updateItemInput dto.UpdateItemInpu
 	return i.repository.Update(*targetItem)
 }
 
-func (i *itemServiceImpl) Delete(itemId uint) error {
-	return i.repository.Delete(itemId)
+func (i *itemServiceImpl) Delete(itemId uint, userId uint) error {
+	return i.repository.Delete(itemId, userId)
 }

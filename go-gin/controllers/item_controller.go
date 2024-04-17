@@ -36,13 +36,21 @@ func (i *itemController) FindAll(ctx *gin.Context) {
 }
 
 func (i *itemController) FindById(ctx *gin.Context) {
+	user, exists := ctx.Get("user")
+	if !exists {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userId := user.(*models.User).ID
+
 	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
 		return
 	}
 
-	item, err := i.service.FindById(uint(itemId))
+	item, err := i.service.FindById(uint(itemId), userId)
 	if err != nil {
 		if err.Error() == "Item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -79,6 +87,14 @@ func (i *itemController) Create(ctx *gin.Context) {
 }
 
 func (i *itemController) Update(ctx *gin.Context) {
+	user, exists := ctx.Get("user")
+	if !exists {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userId := user.(*models.User).ID
+
 	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
@@ -91,7 +107,7 @@ func (i *itemController) Update(ctx *gin.Context) {
 		return
 	}
 
-	updatedItem, err := i.service.Update(uint(itemId), input)
+	updatedItem, err := i.service.Update(uint(itemId), userId, input)
 	if err != nil {
 		if err.Error() == "Item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -104,13 +120,21 @@ func (i *itemController) Update(ctx *gin.Context) {
 }
 
 func (i *itemController) Delete(ctx *gin.Context) {
+	user, exists := ctx.Get("user")
+	if !exists {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userId := user.(*models.User).ID
+
 	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
 		return
 	}
 
-	err = i.service.Delete(uint(itemId))
+	err = i.service.Delete(uint(itemId), userId)
 	if err != nil {
 		if err.Error() == "Item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
