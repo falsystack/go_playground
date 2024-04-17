@@ -1,17 +1,48 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go-gin/controllers"
 	"go-gin/infra"
 	"go-gin/middlewares"
 	"go-gin/repositories"
 	"go-gin/services"
+	"gorm.io/gorm"
 )
+
+func setupRouter(db *gorm.DB) *gin.Engine {
+	//itemRepository := repositories.NewItemMemoryRepository(items)
+	itemRepository := repositories.NewItemRepository(db)
+	itemService := services.NewItemService(itemRepository)
+	itemController := controllers.NewItemController(itemService)
+
+	authRepository := repositories.NewAuthRepository(db)
+	authService := services.NewAuthService(authRepository)
+	authController := controllers.NewAuthController(authService)
+
+	r := gin.Default()    // default ルータの初期化
+	r.Use(cors.Default()) // cors設定
+	authRouter := r.Group("/auth")
+	itemRouter := r.Group("/items")
+	itemRouterWithAuth := r.Group("/items", middlewares.AuthMiddleware(authService))
+
+	itemRouter.GET("/", itemController.FindAll)
+	itemRouterWithAuth.POST("/", itemController.Create)
+	itemRouterWithAuth.GET("/:id", itemController.FindById)
+	itemRouterWithAuth.PUT("/:id", itemController.Update)
+	itemRouterWithAuth.DELETE("/:id", itemController.Delete)
+
+	authRouter.POST("/signup", authController.Signup)
+	authRouter.POST("/login", authController.Login)
+
+	return r
+}
 
 func main() {
 	infra.Init()
 	db := infra.SetupDB()
+	r := setupRouter(db)
 
 	//items := []models.Item{
 	//	{
@@ -36,29 +67,6 @@ func main() {
 	//		SoldOut:     false,
 	//	},
 	//}
-
-	//itemRepository := repositories.NewItemMemoryRepository(items)
-	itemRepository := repositories.NewItemRepository(db)
-	itemService := services.NewItemService(itemRepository)
-	itemController := controllers.NewItemController(itemService)
-
-	authRepository := repositories.NewAuthRepository(db)
-	authService := services.NewAuthService(authRepository)
-	authController := controllers.NewAuthController(authService)
-
-	r := gin.Default() // default ルータの初期化
-	authRouter := r.Group("/auth")
-	itemRouter := r.Group("/items")
-	itemRouterWithAuth := r.Group("/items", middlewares.AuthMiddleware(authService))
-
-	itemRouter.GET("/", itemController.FindAll)
-	itemRouterWithAuth.POST("/", itemController.Create)
-	itemRouterWithAuth.GET("/:id", itemController.FindById)
-	itemRouterWithAuth.PUT("/:id", itemController.Update)
-	itemRouterWithAuth.DELETE("/:id", itemController.Delete)
-
-	authRouter.POST("/signup", authController.Signup)
-	authRouter.POST("/login", authController.Login)
 
 	r.Run("localhost:8080") // 0.0.0.0:8080 でサーバーを立てます。
 }
