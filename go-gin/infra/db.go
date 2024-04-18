@@ -31,7 +31,7 @@ func SetupDB() *gorm.DB {
 		log.Println("Setup postgresql database")
 		return db
 	}
-	db, err = gorm.Open(sqlite.Open(":memory"), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	log.Println("Setup sqlite database")
 	if err != nil {
 		panic("Failed to connect to database")

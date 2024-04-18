@@ -20,7 +20,7 @@ type authServiceImpl struct {
 	repository repositories.AuthRepository
 }
 
-func createToken(userId uint, email string) (*string, error) {
+func CreateToken(userId uint, email string) (*string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":   userId, // subject : userの識別子、ここではuserId
 		"email": email,
@@ -69,7 +69,7 @@ func (a *authServiceImpl) Login(email string, password string) (*string, error) 
 		return nil, err
 	}
 
-	token, err := createToken(foundUser.ID, foundUser.Email)
+	token, err := CreateToken(foundUser.ID, foundUser.Email)
 	if err != nil {
 		return nil, err
 	}
