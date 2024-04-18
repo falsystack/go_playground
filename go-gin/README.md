@@ -272,6 +272,19 @@ func main() {
 }
 ```
 
+## testify
+### install
+```shell
+go get github.com/stretchr/testify
+```
+
+`.env.test`を作成
+
+```.env
+ENV=test
+```
+
+
 # ETC
 randomな文字列生成
 ```shell
