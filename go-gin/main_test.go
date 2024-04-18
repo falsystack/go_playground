@@ -104,7 +104,9 @@ func TestFindAll(t *testing.T) {
 
 func TestCreate(t *testing.T) {
 	// テストのセットアップ
-	router := setup()
+	db := infra.SetupDB()
+	db.AutoMigrate(&models.Item{}, &models.User{})
+	router := setupRouter(db)
 
 	token, err := services.CreateToken(1, "testuser1@test.com")
 	assert.Equal(t, nil, err)
