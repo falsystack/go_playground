@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var opMap map[string]func(int, int) int
 
@@ -16,6 +18,15 @@ func initialOpMap() {
 	opMap["-"] = sub
 	opMap["*"] = mul
 	opMap["/"] = div
+	opMap["**"] = pow
+}
+
+func pow(a int, b int) int {
+	result := 1
+	for i := 0; i < b; i++ {
+		result *= a
+	}
+	return result
 }
 
 func div(a int, b int) int {
@@ -64,6 +75,18 @@ func Test() {
 	}
 
 	if !testCalculate("Test8", "/", 9, 3, 3) {
+		return
+	}
+
+	if !testCalculate("Test9", "**", 2, 3, 8) {
+		return
+	}
+
+	if !testCalculate("Test10", "**", 3, 3, 27) {
+		return
+	}
+
+	if !testCalculate("Test10", "**", 2, 0, 1) {
 		return
 	}
 
