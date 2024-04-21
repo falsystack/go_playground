@@ -2,8 +2,36 @@ package main
 
 import "fmt"
 
+var opMap map[string]func(int, int) int
+
 func main() {
+	initialOpMap()
 	Test()
+}
+
+// use strategy pattern
+func initialOpMap() {
+	opMap = make(map[string]func(int, int) int)
+	opMap["+"] = add
+	opMap["-"] = sub
+	opMap["*"] = mul
+	opMap["/"] = div
+}
+
+func div(a int, b int) int {
+	return a / b
+}
+
+func mul(a int, b int) int {
+	return a * b
+}
+
+func sub(a int, b int) int {
+	return a - b
+}
+
+func add(a int, b int) int {
+	return a + b
 }
 
 func Test() {
@@ -43,18 +71,10 @@ func Test() {
 }
 
 func Calculate(op string, a int, b int) int {
-	switch op {
-	case "+":
-		return a + b
-	case "-":
-		return a - b
-	case "*":
-		return a * b
-	case "/":
-		return a / b
-	default:
-		return 0
+	if f, ok := opMap[op]; ok {
+		return f(a, b)
 	}
+	return 0
 }
 
 func testCalculate(testcase, op string, a, b, expected int) bool {
