@@ -27,17 +27,34 @@ func Test() {
 		return
 	}
 
+	if !testCalculate("Test6", "*", 3, 0, 0) {
+		return
+	}
+
+	if !testCalculate("Test7", "*", 3, -3, -9) {
+		return
+	}
+
+	if !testCalculate("Test8", "/", 9, 3, 3) {
+		return
+	}
+
 	fmt.Println("Success!")
 }
 
 func Calculate(op string, a int, b int) int {
-	if op == "+" {
+	switch op {
+	case "+":
 		return a + b
-	}
-	if op == "*" {
+	case "-":
+		return a - b
+	case "*":
 		return a * b
+	case "/":
+		return a / b
+	default:
+		return 0
 	}
-	return a - b
 }
 
 func testCalculate(testcase, op string, a, b, expected int) bool {
