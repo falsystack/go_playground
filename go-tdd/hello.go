@@ -15,11 +15,18 @@ func Test() {
 		return
 	}
 
+	if !testCalculate("Test3", "-", 5, 3, 2) {
+		return
+	}
+
 	fmt.Println("Success!")
 }
 
-func Calculate(s string, a int, b int) int {
-	return a + b
+func Calculate(op string, a int, b int) int {
+	if op == "+" {
+		return a + b
+	}
+	return a - b
 }
 
 func testCalculate(testcase, op string, a, b, expected int) bool {
