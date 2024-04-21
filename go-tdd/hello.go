@@ -19,12 +19,23 @@ func Test() {
 		return
 	}
 
+	if !testCalculate("Test4", "-", 3, 6, -3) {
+		return
+	}
+
+	if !testCalculate("Test5", "*", 3, 7, 21) {
+		return
+	}
+
 	fmt.Println("Success!")
 }
 
 func Calculate(op string, a int, b int) int {
 	if op == "+" {
 		return a + b
+	}
+	if op == "*" {
+		return a * b
 	}
 	return a - b
 }
