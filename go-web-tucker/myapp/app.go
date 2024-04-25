@@ -44,12 +44,14 @@ func barHadnler(w http.ResponseWriter, r *http.Request) {
 func NewHttpHandler() http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello World")
-	})
+	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/bar", barHadnler)
 
 	mux.Handle("/foo", &fooHandler{})
 
 	return mux
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello World")
 }
