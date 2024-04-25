@@ -1,11 +1,13 @@
 package myapp
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -39,4 +41,35 @@ func TestWithParam(t *testing.T) {
 	assert.Equal(http.StatusOK, resp.Code)
 	data, _ := io.ReadAll(resp.Body)
 	assert.Equal(fmt.Sprintf("Hello %s", name), string(data))
+}
+
+func TestFooHandler_WithoutJson(t *testing.T) {
+	assert := assert.New(t)
+
+	resp := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/foo", nil)
+
+	mux := NewHttpHandler()
+	mux.ServeHTTP(resp, req)
+
+	assert.Equal(http.StatusBadRequest, resp.Code)
+}
+
+func TestFooHandler_WithJson(t *testing.T) {
+	assert := assert.New(t)
+
+	resp := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/foo", strings.NewReader(`{"first_name":"kakao","last_name":"daum","email":"kakao@daum.net"}`))
+
+	mux := NewHttpHandler()
+	mux.ServeHTTP(resp, req)
+
+	assert.Equal(http.StatusCreated, resp.Code)
+
+	u := new(User)
+	err := json.NewDecoder(resp.Body).Decode(u)
+	assert.Nil(err)
+	assert.Equal("kakao", u.FirstName)
+	assert.Equal("daum", u.LastName)
+	assert.Equal("kakao@daum.net", u.Email)
 }

@@ -29,7 +29,7 @@ func (f *fooHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// struct -> json([]byte)
 	data, _ := json.Marshal(u)
 	w.Header().Add("content-type", "application/json")
-	w.WriteHeader(http.StatusOK) // 順番大事、w.Header().Add()が後にくるとAddされない
+	w.WriteHeader(http.StatusCreated) // 順番大事、w.Header().Add()が後にくるとAddされない
 	fmt.Fprint(w, string(data))
 }
 
