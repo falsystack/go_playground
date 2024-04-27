@@ -1,9 +1,9 @@
-package main
+package myapp
 
 import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
-	"go-web-tucker/myupload"
+	"go-web-tucker/myapp/myupload"
 	"io"
 	"mime/multipart"
 	"net/http"

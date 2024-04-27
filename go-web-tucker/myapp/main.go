@@ -1,4 +1,4 @@
-package main
+package myapp
 
 import (
 	"go-web-tucker/myapp"
