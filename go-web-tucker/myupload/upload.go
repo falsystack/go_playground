@@ -1,4 +1,4 @@
-package main
+package myupload
 
 import (
 	"fmt"
@@ -7,13 +7,7 @@ import (
 	"os"
 )
 
-func main() {
-	http.Handle("/", http.FileServer(http.Dir("upload/public")))
-	http.HandleFunc("/uploads", uploadsHandler)
-	http.ListenAndServe(":8080", nil)
-}
-
-func uploadsHandler(w http.ResponseWriter, req *http.Request) {
+func UploadsHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	uploadFile, h, err := req.FormFile("upload_file")
 	defer uploadFile.Close()
@@ -37,5 +31,3 @@ func uploadsHandler(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Uploaded successfully"+filepath)
 }
-
-// 20:03까지함
