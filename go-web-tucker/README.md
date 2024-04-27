@@ -32,3 +32,8 @@ Package gorilla/mux is a powerful HTTP router and URL matcher for building Go we
 go get github.com/gorilla/mux
 ```
 
+## Event Source
+EventSource インターフェイスは、サーバー送信イベントのウェブコンテンツのインターフェイスです。
+
+- https://developer.mozilla.org/ja/docs/Web/API/EventSource
+
