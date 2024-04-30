@@ -24,30 +24,30 @@ var todoMap map[int]*Todo
 // for marshal
 var rd *render.Render
 
-func addTestTodos() {
-	todoMap[1] = &Todo{
-		ID:        1,
-		Name:      "Buy a milk",
-		Completed: false,
-		CreatedAt: time.Now(),
-	}
-	todoMap[2] = &Todo{
-		ID:        2,
-		Name:      "Exercise",
-		Completed: true,
-		CreatedAt: time.Now(),
-	}
-	todoMap[3] = &Todo{
-		ID:        3,
-		Name:      "Home work",
-		Completed: false,
-		CreatedAt: time.Now(),
-	}
-}
+//func addTestTodos() {
+//	todoMap[1] = &Todo{
+//		ID:        1,
+//		Name:      "Buy a milk",
+//		Completed: false,
+//		CreatedAt: time.Now(),
+//	}
+//	todoMap[2] = &Todo{
+//		ID:        2,
+//		Name:      "Exercise",
+//		Completed: true,
+//		CreatedAt: time.Now(),
+//	}
+//	todoMap[3] = &Todo{
+//		ID:        3,
+//		Name:      "Home work",
+//		Completed: false,
+//		CreatedAt: time.Now(),
+//	}
+//}
 
 func MakeHandler() http.Handler {
 	todoMap = make(map[int]*Todo)
-	addTestTodos()
+	//addTestTodos()
 
 	rd = render.New()
 	r := mux.NewRouter()
