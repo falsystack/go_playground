@@ -2,10 +2,14 @@ package app
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/unrolled/render"
+	"github.com/urfave/negroni"
 	"go-web-tucker/todo/model"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 )
 
 type Success struct {
@@ -15,36 +19,34 @@ type Success struct {
 // for marshal
 var rd = render.New()
 
-//func addTestTodos() {
-//	todoMap[1] = &Todo{
-//		ID:        1,
-//		Name:      "Buy a milk",
-//		Completed: false,
-//		CreatedAt: time.Now(),
-//	}
-//	todoMap[2] = &Todo{
-//		ID:        2,
-//		Name:      "Exercise",
-//		Completed: true,
-//		CreatedAt: time.Now(),
-//	}
-//	todoMap[3] = &Todo{
-//		ID:        3,
-//		Name:      "Home work",
-//		Completed: false,
-//		CreatedAt: time.Now(),
-//	}
-//}
+var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 
 type AppHandler struct {
 	http.Handler
 	db model.DBHandler
 }
 
+func CheckSignin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	if strings.Contains(r.URL.Path, "/signin.html") ||
+		strings.Contains(r.URL.Path, "/auth") {
+		next(w, r)
+		return
+	}
+
+	sessionID := getSessionID(r)
+	if sessionID != "" {
+		next(w, r)
+		return
+	}
+	http.Redirect(w, r, "/signin.html", http.StatusTemporaryRedirect)
+}
+
 func MakeHandler() *AppHandler {
 	r := mux.NewRouter()
+	n := negroni.New(negroni.NewRecovery(), negroni.NewLogger(), negroni.HandlerFunc(CheckSignin), negroni.NewStatic(http.Dir("public")))
+	n.UseHandler(r)
 	a := &AppHandler{
-		Handler: r,
+		Handler: n,
 		db:      model.NewDBHandler(),
 	}
 
@@ -53,6 +55,8 @@ func MakeHandler() *AppHandler {
 	r.HandleFunc("/todos", a.addTodoHandler).Methods("POST")
 	r.HandleFunc("/todos", a.getTodoListHandler).Methods("GET")
 	r.HandleFunc("/", a.indexHandler)
+	r.HandleFunc("/auth/google/login", googleLoginHandler)
+	r.HandleFunc("/auth/google/callback", googleAtuCallback)
 	return a
 }
 
@@ -98,4 +102,17 @@ func (a *AppHandler) getTodoListHandler(w http.ResponseWriter, req *http.Request
 
 func (a *AppHandler) indexHandler(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/todo.html", http.StatusTemporaryRedirect)
+}
+
+func getSessionID(req *http.Request) string {
+	session, err := store.Get(req, "session")
+	if err != nil {
+		return ""
+	}
+
+	val := session.Values["id"]
+	if val == nil {
+		return ""
+	}
+	return val.(string)
 }

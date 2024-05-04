@@ -1,21 +1,26 @@
 package main
 
 import (
-	"github.com/urfave/negroni"
+	"github.com/joho/godotenv"
 	"go-web-tucker/todo/app"
 	"log"
 	"net/http"
 )
 
-func main() {
+func init() {
+	err := godotenv.Load("todo/.env")
+	if err != nil {
+		log.Println(err.Error())
+		log.Fatal("Error loading .env file")
+	}
+}
 
+func main() {
 	m := app.MakeHandler()
 	defer m.Close()
-	n := negroni.Classic()
-	n.UseHandler(m)
 
 	log.Println("Listening on :8080")
-	err := http.ListenAndServe(":8080", n)
+	err := http.ListenAndServe(":8080", m)
 	if err != nil {
 		panic(err)
 	}
