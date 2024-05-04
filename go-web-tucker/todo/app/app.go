@@ -77,7 +77,7 @@ func removeTodoHandler(w http.ResponseWriter, req *http.Request) {
 
 func addTodoHandler(w http.ResponseWriter, req *http.Request) {
 	name := req.FormValue("name")
-	todo := model.AddTOdo(name)
+	todo := model.AddTodo(name)
 
 	rd.JSON(w, http.StatusCreated, todo)
 }

@@ -37,3 +37,5 @@ EventSource インターフェイスは、サーバー送信イベントのウ�
 
 - https://developer.mozilla.org/ja/docs/Web/API/EventSource
 
+## cgo
+goでc言語を使用できるようにしてくれるライブラリ
