@@ -3,23 +3,14 @@ package app
 import (
 	"github.com/gorilla/mux"
 	"github.com/unrolled/render"
+	"go-web-tucker/todo/model"
 	"net/http"
 	"strconv"
-	"time"
 )
-
-type Todo struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Completed bool      `json:"completed"`
-	CreatedAt time.Time `json:"created_at"`
-}
 
 type Success struct {
 	Success bool `json:"success"`
 }
-
-var todoMap map[int]*Todo
 
 // for marshal
 var rd *render.Render
@@ -46,7 +37,7 @@ var rd *render.Render
 //}
 
 func MakeHandler() http.Handler {
-	todoMap = make(map[int]*Todo)
+	//todoMap = make(map[int]*model.Todo)
 	//addTestTodos()
 
 	rd = render.New()
@@ -64,19 +55,20 @@ func completeTodoHanlder(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id, _ := strconv.Atoi(vars["id"])
 	complete := req.FormValue("completed") == "true"
-	if todo, ok := todoMap[id]; ok {
-		todo.Completed = complete
-		rd.JSON(w, http.StatusOK, Success{true})
+	ok := model.CompleteTodo(id, complete)
+
+	if ok {
+		rd.JSON(w, http.StatusOK, Success{Success: true})
 		return
 	}
-	rd.JSON(w, http.StatusBadRequest, Success{false})
+	rd.JSON(w, http.StatusBadRequest, Success{Success: false})
 }
 
 func removeTodoHandler(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	id, _ := strconv.Atoi(vars["id"])
-	if _, ok := todoMap[id]; ok {
-		delete(todoMap, id)
+	ok := model.RemoveTodo(id)
+	if ok {
 		rd.JSON(w, http.StatusOK, Success{Success: true})
 		return
 	}
@@ -84,23 +76,14 @@ func removeTodoHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func addTodoHandler(w http.ResponseWriter, req *http.Request) {
-	id := len(todoMap) + 1
-	newTodo := &Todo{
-		ID:        id,
-		Name:      req.FormValue("name"),
-		Completed: false,
-		CreatedAt: time.Now(),
-	}
-	todoMap[id] = newTodo
+	name := req.FormValue("name")
+	todo := model.AddTOdo(name)
 
-	rd.JSON(w, http.StatusCreated, newTodo)
+	rd.JSON(w, http.StatusCreated, todo)
 }
 
 func getTodoListHandler(w http.ResponseWriter, req *http.Request) {
-	list := []*Todo{}
-	for _, v := range todoMap {
-		list = append(list, v)
-	}
+	list := model.GetTodos()
 	rd.JSON(w, http.StatusOK, list)
 }
 
