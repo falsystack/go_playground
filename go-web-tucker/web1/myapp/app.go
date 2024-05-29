@@ -27,7 +27,7 @@ func (f *fooHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	user.CreatedAt = time.Now()
 
 	jsonBin, _ := json.Marshal(user)
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprint(w, string(jsonBin))
 }
