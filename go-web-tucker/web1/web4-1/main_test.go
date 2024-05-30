@@ -1,10 +1,10 @@
-package myapp
+package main
 
 import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
-	"go-web-tucker/myapp/myupload"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -13,32 +13,36 @@ import (
 	"testing"
 )
 
-func TestUpload(t *testing.T) {
+func TestUploadTest(t *testing.T) {
 	assert := assert.New(t)
-	path := ""
+	path := "/Users/yun/Downloads/test.csv"
 	file, _ := os.Open(path)
 	defer file.Close()
 
-	// byte 데이터를 생성
 	buf := &bytes.Buffer{}
+	// io.Writerは bufferを作ってあげれば良い
 	w := multipart.NewWriter(buf)
 	multi, err := w.CreateFormFile("upload_file", filepath.Base(path))
 	assert.NoError(err)
+
 	io.Copy(multi, file)
 	w.Close()
 
 	res := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/uploads", buf)
+	// w.FormDataContentType()はboundaryがついている
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
-	myupload.UploadsHandler(res, req)
+	uploadsHandler(res, req)
 	assert.Equal(http.StatusOK, res.Code)
 
-	// upload 한 파일과 오리지널 파일이 같은지 확인
-	uploadFilePath := "uploads/" + filepath.Base(path)
-	_, err = os.Stat(uploadFilePath)
+	uploadFilePath := "./uploads/" + filepath.Base(path)
+	// file infoが返ってくる
+	stat, err := os.Stat(uploadFilePath)
+	log.Println(stat)
 	assert.NoError(err)
 
+	// uploadしたファイルとoriginファイルが一緒なのかをチェック
 	uploadFile, _ := os.Open(uploadFilePath)
 	originFile, _ := os.Open(path)
 	defer uploadFile.Close()
@@ -47,7 +51,7 @@ func TestUpload(t *testing.T) {
 	uploadData := []byte{}
 	originData := []byte{}
 	uploadFile.Read(uploadData)
-	originFile.Read(originData)
+	uploadFile.Read(originData)
 
-	assert.Equal(originData, uploadData)
+	assert.Equal(uploadData, originData)
 }

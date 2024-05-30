@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 )
@@ -18,6 +19,7 @@ func uploadsHandler(w http.ResponseWriter, r *http.Request) {
 	uploadFile, header, err := r.FormFile("upload_file")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		log.Println(err)
 		fmt.Fprint(w, err)
 		return
 	}
