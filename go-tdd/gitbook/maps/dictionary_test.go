@@ -5,6 +5,28 @@ import (
 	"testing"
 )
 
+func TestAdd(t *testing.T) {
+	dic := Dictionary{}
+	word := "test"
+	definition := "this is just a test"
+
+	dic.Add(word, definition)
+
+	assertDefinition(t, dic, word, definition)
+}
+
+func assertDefinition(t *testing.T, dic Dictionary, word, definition string) {
+	t.Helper()
+
+	got, err := dic.Search(word)
+	if err != nil {
+		t.Fatal("should find added word:", err)
+	}
+	if definition != got {
+		t.Errorf("got %q, want %q", got, definition)
+	}
+}
+
 func TestSearch(t *testing.T) {
 	dic := Dictionary{
 		"test": "this is just a test",
