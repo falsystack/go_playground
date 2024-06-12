@@ -6,13 +6,25 @@ import (
 )
 
 func TestAdd(t *testing.T) {
-	dic := Dictionary{}
-	word := "test"
-	definition := "this is just a test"
+	t.Run("new word", func(t *testing.T) {
+		dictionary := Dictionary{}
+		word := "test"
+		definition := "this is just a test"
 
-	dic.Add(word, definition)
+		err := dictionary.Add(word, definition)
+		assertError(t, err, nil)
+		assertDefinition(t, dictionary, word, definition)
+	})
+	t.Run("existing word", func(t *testing.T) {
+		word := "test"
+		definition := "this is just a test"
+		dic := Dictionary{word: definition}
 
-	assertDefinition(t, dic, word, definition)
+		err := dic.Add(word, definition)
+
+		assertError(t, err, ErrWordExists)
+		assertDefinition(t, dic, word, definition)
+	})
 }
 
 func assertDefinition(t *testing.T, dic Dictionary, word, definition string) {
@@ -48,6 +60,13 @@ func assertError(t *testing.T, got, want error) {
 	t.Helper()
 	if !errors.Is(got, want) {
 		t.Errorf("got %q, want %q", got, want)
+	}
+
+	if got == nil {
+		if want == nil {
+			return
+		}
+		t.Fatal("expected to get an error.")
 	}
 }
 
