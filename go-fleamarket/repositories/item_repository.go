@@ -8,10 +8,17 @@ import (
 type ItemRepository interface {
 	FindAll() (*[]models.Item, error)
 	FindByID(itemID uint) (*models.Item, error)
+	Create(newItem models.Item) (*models.Item, error)
 }
 
 type ItemMemoryRepository struct {
 	items []models.Item
+}
+
+func (i *ItemMemoryRepository) Create(newItem models.Item) (*models.Item, error) {
+	newItem.ID = uint(len(i.items) + 1)
+	i.items = append(i.items, newItem)
+	return &newItem, nil
 }
 
 func (i *ItemMemoryRepository) FindByID(itemID uint) (*models.Item, error) {

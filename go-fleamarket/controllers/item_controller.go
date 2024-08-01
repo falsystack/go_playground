@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-fleamarket/dto"
 	"go-fleamarket/services"
 	"net/http"
 	"strconv"
@@ -10,10 +11,28 @@ import (
 type ItemController interface {
 	FindAll(ctx *gin.Context)
 	FindByID(ctx *gin.Context)
+	Create(ctx *gin.Context)
 }
 
 type ItemControllerImpl struct {
 	service services.ItemService
+}
+
+func (i *ItemControllerImpl) Create(ctx *gin.Context) {
+
+	var input dto.CreateItemInput
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	newItem, err := i.service.Create(input)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"data": newItem})
 }
 
 func (i *ItemControllerImpl) FindByID(ctx *gin.Context) {
