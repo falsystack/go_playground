@@ -41,6 +41,7 @@ func main() {
 	r := gin.Default()
 	r.GET("/items", itemController.FindAll)
 	r.GET("/items/:id", itemController.FindByID)
+	r.PUT("/items/:id", itemController.Update)
 	r.POST("/items", itemController.Create)
 	r.Run(":8080")
 
