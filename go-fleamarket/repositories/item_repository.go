@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"go-fleamarket/models"
+	"gorm.io/gorm"
 )
 
 type ItemRepository interface {
@@ -10,41 +11,67 @@ type ItemRepository interface {
 	FindByID(itemID uint) (*models.Item, error)
 	Create(newItem models.Item) (*models.Item, error)
 	Update(updatedItem models.Item) (*models.Item, error)
+	Delete(itemID uint) error
 }
 
-type ItemMemoryRepository struct {
-	items []models.Item
+type itemORMRepository struct {
+	db *gorm.DB
 }
 
-func (i *ItemMemoryRepository) Update(updatedItem models.Item) (*models.Item, error) {
-	for idx, item := range i.items {
-		if item.ID == updatedItem.ID {
-			i.items[idx] = updatedItem
-			return &i.items[idx], nil
-		}
+func (i *itemORMRepository) FindAll() (*[]models.Item, error) {
+	var items []models.Item
+	result := i.db.Find(&items)
+	if result.Error != nil {
+		return nil, result.Error
 	}
-	return nil, errors.New("item not found")
+	return &items, nil
 }
 
-func (i *ItemMemoryRepository) Create(newItem models.Item) (*models.Item, error) {
-	newItem.ID = uint(len(i.items) + 1)
-	i.items = append(i.items, newItem)
+func (i *itemORMRepository) FindByID(itemID uint) (*models.Item, error) {
+	var item models.Item
+	result := i.db.First(&item, itemID)
+	if result.Error != nil {
+		if result.Error.Error() == "record not found" {
+			return nil, errors.New("item not found")
+		}
+		return nil, result.Error
+	}
+
+	return &item, nil
+}
+
+func (i *itemORMRepository) Create(newItem models.Item) (*models.Item, error) {
+	result := i.db.Create(&newItem)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
 	return &newItem, nil
 }
 
-func (i *ItemMemoryRepository) FindByID(itemID uint) (*models.Item, error) {
-	for _, item := range i.items {
-		if item.ID == itemID {
-			return &item, nil
-		}
+func (i *itemORMRepository) Update(updatedItem models.Item) (*models.Item, error) {
+	result := i.db.Save(updatedItem)
+	if result.Error != nil {
+		return nil, result.Error
 	}
-	return nil, errors.New("item not found")
+	return &updatedItem, nil
 }
 
-func NewItemRepository(items []models.Item) ItemRepository {
-	return &ItemMemoryRepository{items: items}
+func (i *itemORMRepository) Delete(itemID uint) error {
+	deleteItem, err := i.FindByID(itemID)
+	if err != nil {
+		return err
+	}
+
+	// 물리삭제 : i.db.Unscoped().Delete(&deleteItem)
+	// 논리삭제 : i.db.Delete(&deleteItem)
+	result := i.db.Unscoped().Delete(&deleteItem)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
-func (i *ItemMemoryRepository) FindAll() (*[]models.Item, error) {
-	return &i.items, nil
+func NewItemORMRepository(db *gorm.DB) ItemRepository {
+	return &itemORMRepository{db: db}
 }

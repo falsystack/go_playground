@@ -13,10 +13,29 @@ type ItemController interface {
 	FindByID(ctx *gin.Context)
 	Create(ctx *gin.Context)
 	Update(ctx *gin.Context)
+	Delete(ctx *gin.Context)
 }
 
 type ItemControllerImpl struct {
 	service services.ItemService
+}
+
+func (i *ItemControllerImpl) Delete(ctx *gin.Context) {
+	parsedItemID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid item id"})
+		return
+	}
+
+	err = i.service.Delete(uint(parsedItemID))
+	if err != nil {
+		if err.Error() == "item not found" {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected error"})
+		return
+	}
 }
 
 func (i *ItemControllerImpl) Update(ctx *gin.Context) {
