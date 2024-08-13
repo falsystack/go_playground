@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go-fleamarket/controllers"
 	"go-fleamarket/infra"
@@ -23,6 +24,7 @@ func main() {
 	authController := controllers.NewAuthController(authService)
 
 	r := gin.Default()
+	r.Use(cors.Default())
 	itemRouter := r.Group("/items")
 	itemRouterWithAuth := itemRouter.Group("", middlewares.AuthMiddleware(authService))
 	authRouter := r.Group("/auth")
