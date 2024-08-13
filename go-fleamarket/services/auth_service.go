@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"go-fleamarket/models"
 	"go-fleamarket/repositories"
@@ -12,10 +13,44 @@ import (
 type AuthService interface {
 	Signup(email, password string) error
 	Login(email, password string) (*string, error)
+	GetUserFromToken(tokenString string) (*models.User, error)
 }
 
 type authService struct {
 	repository repositories.AuthRepository
+}
+
+func NewAuthService(repository repositories.AuthRepository) AuthService {
+	return &authService{repository: repository}
+}
+
+func (a *authService) GetUserFromToken(tokenString string) (*models.User, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// 서명방법에 문제가 없는지 체크
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var user *models.User
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		// 유효기간이 끊겼는지 체크
+		if float64(time.Now().Unix()) > claims["exp"].(float64) {
+			return nil, jwt.ErrTokenExpired
+		}
+
+		user, err = a.repository.FindUser(claims["email"].(string))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return user, nil
 }
 
 func (a *authService) Login(email, password string) (*string, error) {
@@ -48,10 +83,6 @@ func (a *authService) Signup(email, password string) error {
 		Password: string(hashedPassword),
 	}
 	return a.repository.CreateUser(u)
-}
-
-func NewAuthService(repository repositories.AuthRepository) AuthService {
-	return &authService{repository: repository}
 }
 
 func CreateToken(userID uint, email string) (*string, error) {
