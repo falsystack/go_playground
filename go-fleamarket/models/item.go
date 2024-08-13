@@ -8,4 +8,5 @@ type Item struct {
 	Price       uint   `gorm:"not null"`
 	Description string
 	SoldOut     bool `gorm:"default:false;not null"`
+	UserID      uint `gorm:"not null"` // 1:N FK
 }

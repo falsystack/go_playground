@@ -8,10 +8,10 @@ import (
 
 type ItemRepository interface {
 	FindAll() (*[]models.Item, error)
-	FindByID(itemID uint) (*models.Item, error)
+	FindByID(itemID uint, userID uint) (*models.Item, error)
 	Create(newItem models.Item) (*models.Item, error)
 	Update(updatedItem models.Item) (*models.Item, error)
-	Delete(itemID uint) error
+	Delete(itemID uint, userID uint) error
 }
 
 type itemORMRepository struct {
@@ -27,9 +27,9 @@ func (i *itemORMRepository) FindAll() (*[]models.Item, error) {
 	return &items, nil
 }
 
-func (i *itemORMRepository) FindByID(itemID uint) (*models.Item, error) {
+func (i *itemORMRepository) FindByID(itemID uint, userID uint) (*models.Item, error) {
 	var item models.Item
-	result := i.db.First(&item, itemID)
+	result := i.db.First(&item, "id = ? AND user_id = ?", itemID, userID)
 	if result.Error != nil {
 		if result.Error.Error() == "record not found" {
 			return nil, errors.New("item not found")
@@ -57,8 +57,8 @@ func (i *itemORMRepository) Update(updatedItem models.Item) (*models.Item, error
 	return &updatedItem, nil
 }
 
-func (i *itemORMRepository) Delete(itemID uint) error {
-	deleteItem, err := i.FindByID(itemID)
+func (i *itemORMRepository) Delete(itemID uint, userID uint) error {
+	deleteItem, err := i.FindByID(itemID, userID)
 	if err != nil {
 		return err
 	}

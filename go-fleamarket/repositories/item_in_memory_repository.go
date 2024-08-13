@@ -13,7 +13,7 @@ func NewItemInMemoryRepository(items []models.Item) ItemRepository {
 	return &ItemMemoryRepository{items: items}
 }
 
-func (i *ItemMemoryRepository) Delete(itemID uint) error {
+func (i *ItemMemoryRepository) Delete(itemID uint, userID uint) error {
 	for idx, item := range i.items {
 		if item.ID == itemID {
 			i.items = append(i.items[:idx], i.items[idx+1:]...)
@@ -39,7 +39,7 @@ func (i *ItemMemoryRepository) Create(newItem models.Item) (*models.Item, error)
 	return &newItem, nil
 }
 
-func (i *ItemMemoryRepository) FindByID(itemID uint) (*models.Item, error) {
+func (i *ItemMemoryRepository) FindByID(itemID uint, userID uint) (*models.Item, error) {
 	for _, item := range i.items {
 		if item.ID == itemID {
 			return &item, nil

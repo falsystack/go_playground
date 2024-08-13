@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"go-fleamarket/dto"
+	"go-fleamarket/models"
 	"go-fleamarket/services"
 	"net/http"
 	"strconv"
@@ -21,13 +22,21 @@ type ItemControllerImpl struct {
 }
 
 func (i *ItemControllerImpl) Delete(ctx *gin.Context) {
+	user, exists := ctx.Get("user")
+	if !exists {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userID := user.(*models.User).ID
+
 	parsedItemID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid item id"})
 		return
 	}
 
-	err = i.service.Delete(uint(parsedItemID))
+	err = i.service.Delete(uint(parsedItemID), userID)
 	if err != nil {
 		if err.Error() == "item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -39,6 +48,13 @@ func (i *ItemControllerImpl) Delete(ctx *gin.Context) {
 }
 
 func (i *ItemControllerImpl) Update(ctx *gin.Context) {
+	user, exists := ctx.Get("user")
+	if !exists {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userID := user.(*models.User).ID
 
 	parsedItemID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
@@ -52,7 +68,7 @@ func (i *ItemControllerImpl) Update(ctx *gin.Context) {
 		return
 	}
 
-	updatedItem, err := i.service.Update(uint(parsedItemID), input)
+	updatedItem, err := i.service.Update(uint(parsedItemID), input, userID)
 	if err != nil {
 		if err.Error() == "item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -66,6 +82,13 @@ func (i *ItemControllerImpl) Update(ctx *gin.Context) {
 }
 
 func (i *ItemControllerImpl) Create(ctx *gin.Context) {
+	user, exists := ctx.Get("user")
+	if !exists {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userID := user.(*models.User).ID
 
 	var input dto.CreateItemInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
@@ -73,7 +96,7 @@ func (i *ItemControllerImpl) Create(ctx *gin.Context) {
 		return
 	}
 
-	newItem, err := i.service.Create(input)
+	newItem, err := i.service.Create(input, userID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -83,13 +106,21 @@ func (i *ItemControllerImpl) Create(ctx *gin.Context) {
 }
 
 func (i *ItemControllerImpl) FindByID(ctx *gin.Context) {
+	user, exists := ctx.Get("user")
+	if !exists {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userID := user.(*models.User).ID
+
 	parsedItemID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid item id"})
 		return
 	}
 
-	item, err := i.service.FindByID(uint(parsedItemID))
+	item, err := i.service.FindByID(uint(parsedItemID), userID)
 	if err != nil {
 		if err.Error() == "item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
