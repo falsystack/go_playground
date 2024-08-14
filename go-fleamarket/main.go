@@ -8,13 +8,10 @@ import (
 	"go-fleamarket/middlewares"
 	"go-fleamarket/repositories"
 	"go-fleamarket/services"
+	"gorm.io/gorm"
 )
 
-func main() {
-	infra.Initialize()
-	db := infra.SetupDB()
-
-	//itemRepository := repositories.NewItemInMemoryRepository(items)
+func setupRouter(db *gorm.DB) *gin.Engine {
 	itemRepository := repositories.NewItemORMRepository(db)
 	itemService := services.NewItemService(itemRepository)
 	itemController := controllers.NewItemController(itemService)
@@ -29,7 +26,7 @@ func main() {
 	itemRouterWithAuth := itemRouter.Group("", middlewares.AuthMiddleware(authService))
 	authRouter := r.Group("/auth")
 
-	itemRouter.GET("/", itemController.FindAll)
+	itemRouter.GET("", itemController.FindAll)
 	itemRouterWithAuth.GET("/:id", itemController.FindByID)
 	itemRouterWithAuth.PUT("/:id", itemController.Update)
 	itemRouterWithAuth.POST("", itemController.Create)
@@ -37,6 +34,14 @@ func main() {
 
 	authRouter.POST("/", authController.Signup)
 	authRouter.POST("/login", authController.Login)
-	r.Run(":8080")
 
+	return r
+}
+
+func main() {
+	infra.Initialize()
+	db := infra.SetupDB()
+	r := setupRouter(db)
+
+	r.Run(":8080")
 }
