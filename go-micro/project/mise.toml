@@ -2,9 +2,9 @@
 description = "starts all containers in ther background without forcing build"
 run = "echo Starting docker images; docker-compose up -d; echo Docker images started!"
 
-[tasks.up_build]
+[tasks."up_build:build_broker build_auth"]
 description = "stops docker-compose (if running), builds all projects and starts docker compose"
-run = "echo Stopping docker images (if running...); docker-compose down -v; echo Building (when required) and starting docker images...; docker-compose up --build -d; echo Docker images built and started!"
+run = "echo Stopping docker images '(if running...)'; docker-compose down -v; echo Building '(when required)' and starting docker images...; docker-compose up --build -d; echo Docker images built and started!"
 
 [tasks.down]
 description = "stop docker compose"
@@ -12,16 +12,20 @@ run = "echo Stopping docker compose...; docker-compose down -v; echo Done!"
 
 [tasks.build_broker]
 description = "builds ther broker binary as a linux executable"
-run = "cd ../broker-service && env GOOS=linux CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api"
+run = "cd ../broker-service && env GOOS=linux CGO_ENABLED=0 go build -o brokerApp ./cmd/api"
+
+[tasks.build_auth]
+description = "builds ther authentication binary as a linux executable"
+run = "echo Building auth binary...; cd ../authentication-service && env GOOS=linux CGO_ENABLED=0 go build -o authApp ./cmd/api"
 
 [tasks.build_front]
 description = "builds the front end binary"
-run = "echo Building front end binary...; cd ../front-end && env CGO_ENABLED=0 go build -o ${FRONT_END_BINARY} ./cmd/web; echo Done!"
+run = "echo Building front end binary...; cd ../front-end && env CGO_ENABLED=0 go build -o frontApp ./cmd/web; echo Done!"
 
 [tasks."start:build_front"]
 description = "starts the front end"
-run = "echo Starting front end; cd ../front-end && ./${FRONT_END_BINARY} &"
+run = "echo Starting front end; cd ../front-end && ./frontApp &"
 
 [tasks.stop]
 description = "stop the front end"
-run = "echo Stopping front end...; -pkill -SIGTERM -f './${FRONT_END_BINARY}'; echo Stopped front end!"
+run = "echo Stopping front end...; -pkill -SIGTERM -f './frontApp'; echo Stopped front end!"
